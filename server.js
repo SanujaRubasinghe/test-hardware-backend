@@ -10,7 +10,19 @@ const bodyParser = require("body-parser")
 require("dotenv").config()
 
 const app = express()
-app.use(cors({origin: "https://hardware-delta.vercel.app/"}))
+const allowedOrigins = ['https://hardware-delta.vercel.app'];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
