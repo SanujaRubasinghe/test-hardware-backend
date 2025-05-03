@@ -12,7 +12,7 @@ exports.purchaseProducts = async (req, res) => {
             INSERT INTO orders (
                 user_id, first_name, last_name, company_name, country, city, 
                 street_address, apartment, postcode, phone, email, order_notes, payment_method
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8, $9, $10, $11, $12, $13);
         `
 
         const values = [
@@ -20,7 +20,7 @@ exports.purchaseProducts = async (req, res) => {
             streetAddress, apartment, postcode, phone, email, orderNotes, paymentMethod
         ];
 
-        const result = await pool.execute(query, values)
+        const result = await pool.query(query, values)
         res.status(201).json({message: "Order placed successfully"})
         
     } catch (err) {
@@ -31,7 +31,7 @@ exports.purchaseProducts = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const [rows] = await pool.execute("select * from product_data")
+        const [rows] = await pool.query("select * from product_data")
         res.json(rows)
     } catch (err) {
         console.error(err)
@@ -42,7 +42,7 @@ exports.getAllProducts = async (req, res) => {
 exports.getProduct = async (req, res) => {
     try {
         const productId = req.params.id
-        const [rows] = await pool.execute("select * from product_data where prtdid=?", [productId])
+        const [rows] = await pool.query("select * from product_data where prtdid=$1", [productId])
 
         if (rows.length === 0) {
             return res.status(404).json({error: "Product not found"})
@@ -63,11 +63,11 @@ exports.addNewProduct = async (req, res) => {
     try {
         const addProductQuery = `
             insert into product(prdtid, catid, scatid, delid, delalwd, wght1, delchg)
-            values(?,?,?,?,?,?,?)
+            values($1,$2,$3,$4,$5,$6,$7)
         `
         const addProductdata = `
             insert into product_data(name, sku, price, images, sizes, colors, unit, prtdid)
-            values(?,?,?,?,?,?,?,?)
+            values($1,$2,$3,$4,$5,$6,$7,$8)
         `
         const productValues = [productId, category, subcategory, deliveryStatus, deliveryAllowed, weight, 0]
         const productDataValues = [
@@ -91,23 +91,23 @@ exports.filterProducts = async (req, res) => {
         const params = []
 
         if (category) {
-            query += ' and catid = ?'
+            query += ' and catid = $1'
             params.push(category)
         }
         if (minPrice) {
-            query += ' and price >= ?'
+            query += ' and price >= $2'
             params.push(minPrice)
         }
         if (maxPrice) {
-            query += ' and price <= ?'
+            query += ' and price <= $3'
             params.push(maxPrice)
         }
         if (deliveryArea) {
-            query += ' and delid like ?'
-            params.push(deliveryArea)
+            query += ' and delid like $4'
+            params.push(`%${deliveryArea}%`)
         }
 
-        const [results] = await pool.execute(query, params)
+        const [results] = await pool.query(query, params)
         res.json(results)
     } catch (error) {
         console.error(error)

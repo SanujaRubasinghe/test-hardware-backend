@@ -47,11 +47,11 @@ const createComplaint = async (req, res) => {
     try {
         const query = `insert into customer_complaints(full_name, email, invoice_number, rep_code, contact_number,
                        branch, message, image_url)
-                       values(?,?,?,?,?,?,?,?)`
+                       values($1,$2,$3,$4,$5,$6,$7,$8)`
 
         const values = [fullName, email, invoiceNumber, repCode, contactNumber, branch, message, finaleImageFilename]
 
-        const results = await pool.execute(query, values)
+        const results = await pool.query(query, values)
         res.status(201).json({message: "Complaint recorded sucessfully"})
             
     } catch (err) {
@@ -65,11 +65,11 @@ const createReview = async (req, res) => {
 
     try {
         const query = `insert into customer_feedback(rating, comment, profile_picture_url, user_name)
-                       values(?,?,?,?)`
+                       values($1,$2,$3,$4)`
 
         const values = [rating, comment, profilePicture, userName]
 
-        const results = await pool.execute(query, values)
+        const results = await pool.query(query, values)
         res.status(201).json({message: "Review recorded successfully"})
 
     } catch (error) {
@@ -80,7 +80,7 @@ const createReview = async (req, res) => {
 
 const getAllReviews = async (req, res) => {
     try {
-        const [rows] = await pool.execute('select * from customer_feedback')
+        const [rows] = await pool.query('select * from customer_feedback')
         res.json(rows)
     } catch (error) {
         res.status(500).json({err: "Internal server error. Failed to fetch reviews"})

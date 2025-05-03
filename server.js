@@ -10,7 +10,7 @@ const bodyParser = require("body-parser")
 require("dotenv").config()
 
 const app = express()
-app.use(cors({origin: "http://localhost:3000", credentials: true}))
+app.use(cors({origin: "https://test-vercel-ashen-phi.vercel.app"}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
