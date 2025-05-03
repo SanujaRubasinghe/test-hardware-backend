@@ -80,8 +80,8 @@ const createReview = async (req, res) => {
 
 const getAllReviews = async (req, res) => {
     try {
-        const [rows] = await pool.query('select * from customer_feedback')
-        res.json(rows)
+        const results = await pool.query('select * from customer_feedback')
+        res.json(results.rows)
     } catch (error) {
         res.status(500).json({err: "Internal server error. Failed to fetch reviews"})
         console.log(error)

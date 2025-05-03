@@ -31,8 +31,8 @@ exports.purchaseProducts = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const [rows] = await pool.query("select * from product_data")
-        res.json(rows)
+        const results = await pool.query("select * from product_data")
+        res.json(results.rows)
     } catch (err) {
         console.error(err)
         res.status(500).json({error: "Internal Server Error"})
@@ -42,12 +42,12 @@ exports.getAllProducts = async (req, res) => {
 exports.getProduct = async (req, res) => {
     try {
         const productId = req.params.id
-        const [rows] = await pool.query("select * from product_data where prtdid=$1", [productId])
+        const result = await pool.query("select * from product_data where prtdid=$1", [productId])
 
-        if (rows.length === 0) {
+        if (result.rowCount === 0) {
             return res.status(404).json({error: "Product not found"})
         }
-        res.json(rows)
+        res.json(result.rows)
     } catch (err) {
         console.error(err.message)
         res.status(500).json({error: "Internal Server Error"})
@@ -107,8 +107,8 @@ exports.filterProducts = async (req, res) => {
             params.push(`%${deliveryArea}%`)
         }
 
-        const [results] = await pool.query(query, params)
-        res.json(results)
+        const results = await pool.query(query, params)
+        res.json(results.rows)
     } catch (error) {
         console.error(error)
         res.status(500).json({message: "Internal Server Error"})
