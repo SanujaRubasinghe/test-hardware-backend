@@ -8,7 +8,7 @@ require("dotenv").config()
 router.post("/login", async (req, res) => {
     const {username, password} = req.body
     try {
-        const result = await pool.query("select * from usrtbl where usrname=?", [username])
+        const result = await pool.query("select * from usrtbl where usrname=$1", [username])
         if (result.rowCount === 0) {
             return res.status(400).json({message: "User not found"})
         }
@@ -39,7 +39,7 @@ router.post("/logout", (req, res) => {
 })
 
 router.get("/profile", authenticateToken, async (req, res) => {
-    const result = await pool.query("select id, usrname, usremail from usrtbl where id=?", [req.user.id])
+    const result = await pool.query("select id, usrname, usremail from usrtbl where id=$1", [req.user.id])
     res.json(result.rows[0])
 })
 
